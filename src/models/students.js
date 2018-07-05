@@ -4,8 +4,49 @@ const db = require('../../db')
 // Basic CRUD Methods
 //////////////////////////////////////////////////////////////////////////////
 
+function getAll(){
+  return db('students') // SELECT * FROM students
+}
+
 function getOne(studentId){
   return db('students').where({ id: studentId }).first()
+
+   // SELECT * FROM students WHERE id = ?
+}
+
+function create(name, cohorts_id){
+  return (
+    db('students')
+    .insert({ name, cohorts_id })
+    .returning('*')
+    .then(function([data]){
+      return data
+    })
+  )
+}
+
+function update(studentId, name, cohorts_id){
+  return (
+    db('students').where({ id: studentId })
+    .update({name, cohorts_id})
+    .returning('*')
+    .then(function([data]){
+      return data
+    })
+  )
+}
+
+function remove(studentId){
+  return (
+    db('students')
+    .where({ id: studentId })
+    .del()
+    .returning('*')
+    .then(function([data]){
+      delete data.id
+      return data
+    })
+  )
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -27,6 +68,10 @@ function getAllInstructors(studentId){
 }
 
 module.exports = {
+  getAll,
   getOne,
+  create,
+  update,
+  remove,
   getAllInstructors
 }
